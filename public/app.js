@@ -15,6 +15,12 @@ $(document).ready(() => {
       createTodo();
     }
   });
+  
+  //handle delete
+  $('.list').on('click', 'span', function(){
+    const todoElem = $(this).parent();
+    deleteTodo(todoElem);
+  });
 });
 
 function addTodos(todos){
@@ -35,10 +41,26 @@ function createTodo(){
 }
 
 function addTodo(todo){
-    const todoElem = $(`<li class="task">${todo.name}</li>`);
+    const todoElem = $(`<li class="task">${todo.name}<span>X</span></li>`);
     todoElem.addClass('task');
+    
+    //use jQuery data store.
+    todoElem.data('id', todo._id);
     if (todo.completed){
       todoElem.addClass('done');
     }
     $('ul.list').append(todoElem);
+}
+
+function deleteTodo(todoElem){
+
+    const id = todoElem.data('id');
+
+    $.ajax(`/api/todos/${id}`, {method: 'DELETE'})
+    .then(function(){
+      todoElem.remove();
+    })
+    .catch(function(err){
+      console.log(err);
+    });
 }
