@@ -16,8 +16,14 @@ $(document).ready(() => {
     }
   });
   
+  $('.list').on('click', 'li', function(){
+    updateTodo($(this));
+  });
+  
   //handle delete
-  $('.list').on('click', 'span', function(){
+  $('.list').on('click', 'span', function(e){
+    //stop the event from bubbling up to li
+    e.stopPropagation();
     const todoElem = $(this).parent();
     deleteTodo(todoElem);
   });
@@ -46,6 +52,7 @@ function addTodo(todo){
     
     //use jQuery data store.
     todoElem.data('id', todo._id);
+    todoElem.data('completed', todo.completed);
     if (todo.completed){
       todoElem.addClass('done');
     }
@@ -63,4 +70,15 @@ function deleteTodo(todoElem){
     .catch(function(err){
       console.log(err);
     });
+}
+
+function updateTodo(todoElem){
+  const id = todoElem.data('id');
+  const completed = todoElem.data('completed');
+  $.ajax(`/api/todos/${id}`, {method: 'PUT', data: {completed: !completed }})
+  .then(function(){
+    todoElem.toggleClass('done');
+    todoElem.data('completed', !completed);
+  })
+  .catch()
 }
